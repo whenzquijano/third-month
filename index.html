@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Our Chronicles — 3D Flipbook</title>
+<title>3rd Month Date — 3D Flipbook</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,7 +27,7 @@
     --wax-red: #7a1010;
     --wax-dark: #4a0404;
 
-    /* Responsive Two-Sided Book Size */
+    /* Desktop Book Size */
     --page-w: min(45vw, 420px);
     --page-h: max(480px, min(65vw, 600px));
   }
@@ -140,7 +140,6 @@
     transform-style: preserve-3d;
   }
 
-  /* Centering Logic based on state */
   .book-container.closed-front {
     transform: translateX(calc(var(--page-w) / 2 * -1)) scale(0.95);
   }
@@ -162,7 +161,7 @@
   /* ── LEAVES & PAGES ── */
   .leaf {
     position: absolute;
-    right: 0; /* Align all leaves to the right half initially */
+    right: 0;
     width: var(--page-w);
     height: 100%;
     transform-origin: left center;
@@ -351,27 +350,6 @@
     filter: sepia(0.2) contrast(1.05);
   }
 
-  .photo-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    background: rgba(139, 115, 85, 0.05);
-    cursor: pointer;
-    border: 1px dashed rgba(139, 115, 85, 0.4);
-    transition: background 0.2s;
-  }
-
-  .photo-placeholder:hover { background: rgba(139, 115, 85, 0.15); }
-  .photo-placeholder svg { opacity: 0.6; color: var(--ink-soft); }
-  .photo-placeholder span {
-    font-size: 11px; color: var(--ink-soft); letter-spacing: 0.1em; font-family: 'Cinzel', serif;
-  }
-  .photo-placeholder input[type="file"] { display: none; }
-
   .caption-strip {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -411,7 +389,27 @@
   .page.front .page-num { right: 25px; }
   .page.back .page-num { left: 25px; }
 
-  /* ── WAX SEAL ── */
+  /* ── WAX SEAL & TWINE ── */
+  .twine {
+    position: absolute;
+    top: 50%;
+    left: -10px;
+    right: -20px;
+    height: 8px;
+    background: repeating-linear-gradient(
+      45deg,
+      #5c4033,
+      #5c4033 2px,
+      #3e2723 2px,
+      #3e2723 4px
+    );
+    transform: translateY(-50%);
+    z-index: 900;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+    transition: opacity 0.5s, transform 0.5s;
+    pointer-events: none;
+  }
+
   .wax-seal {
     position: absolute;
     top: 50%;
@@ -505,13 +503,80 @@
   
   .page-counter { font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 0.15em; color: var(--parchment); }
 
+  /* ── POCKET DIARY MOBILE OPTIMIZATION (Vertical Phones) ── */
   @media (max-width: 768px) {
-    :root { --page-w: 48vw; }
-    .message-content { padding: 2rem 1.5rem; }
-    .photo-frame { inset: 20px 20px 90px; }
-    .caption-strip { padding: 15px 20px; height: 90px; }
-    .msg-heading { font-size: 1.4rem; }
-    .msg-body { font-size: 13px; margin-bottom: 1rem; }
+    :root { 
+      --page-w: 46vw; /* Takes up 92% of the mobile screen */
+      --page-h: calc(var(--page-w) * 1.75); /* Locks it to a realistic book proportion! */
+    }
+    
+    .header { margin-bottom: 1.5rem; }
+    .header h1 { font-size: 1.6rem; }
+    .header .eyebrow { font-size: 9px; letter-spacing: 0.25em; }
+    .divider { width: 150px; margin-top: 0.5rem; }
+
+    /* Book Centering on Mobile */
+    .book-container.closed-front { transform: translateX(calc(var(--page-w) / 2 * -1)) scale(1); }
+    .book-container.opened { transform: translateX(0) scale(1); }
+    .book-container.closed-back { transform: translateX(calc(var(--page-w) / 2)) scale(1); }
+    
+    /* Cover Adjustments */
+    .cover-content { padding: 1rem; inset: 10px; }
+    .cover-title { font-size: 1.25rem; }
+    .cover-title em { font-size: 1.15em; margin-top: 0.5rem; }
+    .cover-names { font-size: 9px; margin-top: 1.5rem; }
+    .cover-rule { width: 40px; margin: 0.5rem auto; }
+    .cover-tagline { font-size: 11px; margin-top: 1rem; line-height: 1.4; padding: 0 10px; }
+
+    /* Message Side Adjustments (Right side) */
+    .message-content { 
+      padding: 1.25rem 1rem; 
+      justify-content: flex-start; /* Pushes text to the top */
+      overflow-y: auto; /* Allows scrolling if text is long */
+    }
+    
+    /* Hides the scrollbar for a cleaner look, but keeps it scrollable */
+    .message-content::-webkit-scrollbar { display: none; }
+    .message-content { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .msg-label { font-size: 8px; margin-bottom: 0.4rem; letter-spacing: 0.15em; margin-top: 0.5rem; }
+    .msg-heading { font-size: 1.05rem; line-height: 1.2; }
+    .msg-rule { margin: 0.6rem 0; width: 30px; height: 1.5px; }
+    .msg-body { font-size: 10.5px; line-height: 1.5; margin-bottom: 1rem; }
+    .msg-signature { font-size: 11px; margin-bottom: 1.5rem; } /* Extra margin for scrolling */
+
+    /* Media Side Adjustments (Left side) */
+    .photo-frame { inset: 15px 15px 75px; padding: 4px; }
+    .caption-strip { height: 65px; padding: 10px 15px; gap: 4px; }
+    .caption-title { font-size: 11.5px; }
+    .caption-date { font-size: 8px; }
+
+    /* Details */
+    .page-num { bottom: 12px; font-size: 8px; }
+    .page.front .page-num { right: 15px; }
+    .page.back .page-num { left: 15px; }
+
+    /* Wax Seal Scaled Down */
+    .wax-seal { width: 50px; height: 50px; right: -25px; }
+    .wax-seal svg { width: 20px; height: 20px; }
+    .wax-seal .click-text { top: 60px; font-size: 9px; padding: 4px 10px; }
+
+    /* Navigation Mobile */
+    .nav { gap: 1.5rem; margin-top: 1rem; }
+    .nav-btn { width: 42px; height: 42px; }
+    .nav-btn svg { width: 18px; height: 18px; }
+    .page-counter { font-size: 11px; }
+  }
+
+  /* ── LANDSCAPE PHONE OPTIMIZATION ── */
+  @media (max-height: 500px) and (orientation: landscape) {
+    :root { 
+      --page-w: 35vw; 
+      --page-h: 85vh; 
+    }
+    body { padding-top: 1rem; justify-content: center; }
+    .header { display: none; /* Hide header so book takes full screen */ }
+    .nav { position: absolute; bottom: 5vh; gap: 4rem; }
   }
 </style>
 </head>
@@ -520,14 +585,15 @@
 <div id="fireflies-container"></div>
 
 <header class="header">
-  <p class="eyebrow">A monthsary for two</p>
-  <h1>Our <em>Adventure</em></h1>
+  <p class="eyebrow">To my beloved</p>
+  <h1>Third <em>Monthsary</em></h1>
   <div class="divider"><span class="divider-leaf">✤</span></div>
 </header>
 
 <div class="stage">
   <div class="book-container closed-front" id="bookContainer">
     <div class="book" id="book">
+      <div class="twine" id="twine"></div>
       <div class="wax-seal" id="waxSeal">
         <svg viewBox="0 0 24 24"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>
         <span class="click-text">Break Seal</span>
@@ -561,10 +627,14 @@ for(let i=0; i<15; i++) {
   ffContainer.appendChild(ff);
 }
 
-// Data Array (12 Chapters)
+// ----------------------------------------------------------------------
+// READ ME: CHANGE THE "media" VALUE TO MATCH YOUR EXACT FILE NAMES
+// Ensure the files are uploaded in the same folder as this HTML file!
+// ----------------------------------------------------------------------
 const CONTENT = [
   {
-    caption: { date: 'Month 1', title: 'Uncharted Territory' },
+    media: '1.jpg', 
+    caption: { date: '1st Photo', title: 'Uncharted Territory' },
     message: {
       heading: 'I knew from day one.',
       body: 'The first time we talked, something clicked inside me that I couldn\'t quite explain. I just knew you were someone special — a mystery I wanted to explore completely, slowly, and for a long time.',
@@ -572,7 +642,8 @@ const CONTENT = [
     }
   },
   {
-    caption: { date: 'Month 2', title: 'Mapping the Details' },
+    media: '2.jpg',
+    caption: { date: '2nd Photo', title: 'Mapping the Details' },
     message: {
       heading: 'Every detail I love.',
       body: 'Learning your little habits — how you laugh, what you order, the way you say my name — each one felt like a tiny treasure. I was quietly collecting all of them, saving them like pressed leaves in a book.',
@@ -580,7 +651,8 @@ const CONTENT = [
     }
   },
   {
-    caption: { date: 'Month 3', title: 'Our First Escapades' },
+    media: '3.jpg',
+    caption: { date: '3rd Photo', title: 'Our First Escapades' },
     message: {
       heading: 'Anywhere with you.',
       body: 'It doesn\'t matter where we go — deep in the jungle or just walking down a familiar street. Every place becomes wild and wonderful the moment we\'re together. You make the ordinary feel magical.',
@@ -588,7 +660,8 @@ const CONTENT = [
     }
   },
   {
-    caption: { date: 'Month 4', title: 'Echoes of Laughter' },
+    media: '4.jpg',
+    caption: { date: '4th Photo', title: 'Echoes of Laughter' },
     message: {
       heading: 'You make me laugh like no one else.',
       body: 'There are jokes only we understand, laughs so loud they echo through the trees, and moments so absurd only we find them funny. That private world we\'ve built together — I treasure it deeply.',
@@ -596,7 +669,8 @@ const CONTENT = [
     }
   },
   {
-    caption: { date: 'Month 5', title: 'Quiet in the Canopy' },
+    media: '5.jpg',
+    caption: { date: '5th Photo', title: 'Quiet in the Canopy' },
     message: {
       heading: 'Silence feels safe with you.',
       body: 'Not every beautiful moment is loud. Some of my favorites are the quiet ones — sitting close, listening to the world breathe, feeling completely at peace because you\'re right there.',
@@ -604,7 +678,8 @@ const CONTENT = [
     }
   },
   {
-    caption: { date: 'Month 6', title: 'Halfway Across' },
+    media: '6.jpg',
+    caption: { date: '6th Photo', title: 'Halfway Across' },
     message: {
       heading: 'Six months of us.',
       body: 'Half a year of sunrises and sunsets, easy trails and steep climbs, inside jokes and genuine tears. Every single day has been worth it because you\'re my compass. Here\'s to the next six.',
@@ -612,7 +687,8 @@ const CONTENT = [
     }
   },
   {
-    caption: { date: 'Month 7', title: 'Sudden Discoveries' },
+    media: '7.jpg',
+    caption: { date: '7th Photo', title: 'Sudden Discoveries' },
     message: {
       heading: 'You still catch me off guard.',
       body: 'Just when I think I have the map memorized, you do something that takes my breath away. A kindness I didn\'t expect, a word that hits exactly right. You keep reminding me why I choose you.',
@@ -620,7 +696,8 @@ const CONTENT = [
     }
   },
   {
-    caption: { date: 'Month 8', title: 'Roots Growing Deeper' },
+    media: '8.jpg',
+    caption: { date: '8th Photo', title: 'Roots Growing Deeper' },
     message: {
       heading: 'Better because of you.',
       body: 'Being loved by you makes me want to be a stronger version of myself. Not because I have to, but because I see how beautifully you navigate life, and I want to walk right beside you.',
@@ -628,7 +705,8 @@ const CONTENT = [
     }
   },
   {
-    caption: { date: 'Month 9', title: 'Weathering the Storms' },
+    media: '9.jpg',
+    caption: { date: '9th Photo', title: 'Weathering the Storms' },
     message: {
       heading: 'You stayed.',
       body: 'Love isn\'t just the sunny days — it\'s also the heavy rains, when you held my hand through the storm and didn\'t seek shelter alone. That\'s the unwavering loyalty I want to return to you.',
@@ -636,7 +714,8 @@ const CONTENT = [
     }
   },
   {
-    caption: { date: 'Month 10', title: 'Charting the Future' },
+    media: '10.jpg',
+    caption: { date: '10th Photo', title: 'Charting the Future' },
     message: {
       heading: 'I want it all with you.',
       body: 'I catch myself imagining what the horizon looks like — and every version of it has you there. Not because I force the picture, but because every wild dream I have somehow has you at the center.',
@@ -644,7 +723,8 @@ const CONTENT = [
     }
   },
   {
-    caption: { date: 'Month 11', title: 'The Little Treasures' },
+    media: '11.jpg',
+    caption: { date: '11th Photo', title: 'The Little Treasures' },
     message: {
       heading: 'It\'s the small things.',
       body: 'Good morning signals. Making sure I have what I need. Checking if I navigated home safe. These little things add up to a massive feeling of being loved. You love me in the details.',
@@ -652,10 +732,11 @@ const CONTENT = [
     }
   },
   {
-    mediaType: 'video', // FINAL SLIDE IS VIDEO
-    caption: { date: 'Month 13', title: 'To the Horizon' },
+    mediaType: 'video', 
+    media: '12.mp4', 
+    caption: { date: 'A vlog', title: 'To the Horizon' },
     message: {
-      heading: 'Thank you for being my co-explorer.',
+      heading: 'A yap from the heart.',
       body: 'Every page of this ancient journal is a memory I\'m grateful for. But the best part? We\'ve barely scratched the surface. There are so many blank pages ahead — and I want to fill every single one with you.',
       sig: 'Yours, now and always ✤'
     }
@@ -680,22 +761,23 @@ for (let i = 0; i < numLeaves; i++) {
     front.classList.add('cover-page');
     front.innerHTML = `
       <div class="cover-content">
-        <h2 class="cover-title">OUR<br><em>Chronicles</em></h2>
+        <h2 class="cover-title">THIRD MONTH<br><em>Date</em></h2>
         <div class="cover-rule"></div>
-        <p class="cover-names">You & Me</p>
-        <p class="cover-tagline">"To the greatest adventure of my life."</p>
+        <p class="cover-names">You? & Me</p>
+        <p class="cover-tagline">"To the lonliest date of my life."</p>
       </div>`;
     
-    // Attach the wax seal directly to the cover leaf so it moves with it
+    // Attach twine and seal to the moving cover
+    const twine = document.getElementById('twine');
+    if(twine) front.appendChild(twine);
     const seal = document.getElementById('waxSeal');
     if(seal) front.appendChild(seal);
 
   } else {
-    // The front of leaf `i` shows the text for chapter `i-1`
     const p = CONTENT[i - 1];
     front.innerHTML = `
       <div class="message-content">
-        <p class="msg-label">Explorer's Note</p>
+        <p class="msg-label">Date Note</p>
         <h2 class="msg-heading">${p.message.heading}</h2>
         <div class="msg-rule"></div>
         <p class="msg-body">${p.message.body}</p>
@@ -709,50 +791,30 @@ for (let i = 0; i < numLeaves; i++) {
   back.className = 'page back';
   
   if (i === numLeaves - 1) {
-    // The back of the final leaf is the back cover
     back.classList.add('cover-page');
     back.innerHTML = `
       <div class="cover-content">
         <h2 class="cover-title"><br><em>Fin</em></h2>
         <div class="cover-rule"></div>
-        <p class="cover-tagline">"The adventure continues."</p>
+        <p class="cover-tagline">"I hope the next date isn't as lonely as this."</p>
       </div>`;
   } else {
-    // The back of leaf `i` shows the media for chapter `i`
     const p = CONTENT[i];
     const isVideo = p.mediaType === 'video';
     
+    // Renders the image/video straight from the file path
     back.innerHTML = `
       <span class="page-num">Pg ${i * 2 + 1}</span>
-      <div class="photo-frame" id="frame-${i}">
-        <label class="photo-placeholder" for="upload-${i}">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-            ${isVideo ? '<polygon points="5 3 19 12 5 21 5 3"/>' : '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>'}
-          </svg>
-          <span>${isVideo ? 'Pin Video Attachment' : 'Pin Photograph'}</span>
-          <input type="file" id="upload-${i}" accept="${isVideo ? 'video/*' : 'image/*'}">
-        </label>
+      <div class="photo-frame">
+        ${isVideo ? 
+          `<video src="${p.media}" controls playsinline></video>` : 
+          `<img src="${p.media}" alt="${p.caption.title}">`
+        }
       </div>
       <div class="caption-strip">
         <span class="caption-date">${p.caption.date}</span>
         <span class="caption-title">${p.caption.title}</span>
       </div>`;
-
-    // File upload logic
-    setTimeout(() => {
-      const input = back.querySelector(`#upload-${i}`);
-      input.addEventListener('change', e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const url = URL.createObjectURL(file);
-        const frame = document.getElementById(`frame-${i}`);
-        if (isVideo) {
-          frame.innerHTML = `<video src="${url}" controls autoplay loop muted></video>`;
-        } else {
-          frame.innerHTML = `<img src="${url}" alt="Memory ${i}">`;
-        }
-      });
-    }, 0);
   }
 
   leaf.appendChild(front);
@@ -774,10 +836,8 @@ const waxSeal = document.getElementById('waxSeal');
 function updateZIndex() {
   for (let i = 0; i < numLeaves; i++) {
     if (i < currentSpread) {
-      // Flipped to the left, higher index = higher z-index (closer to top)
       leafEls[i].style.zIndex = i;
     } else {
-      // Resting on the right, lower index = higher z-index (closer to top)
       leafEls[i].style.zIndex = numLeaves - i;
     }
   }
@@ -786,7 +846,9 @@ function updateZIndex() {
 function goToSpread(spreadIndex) {
   if (spreadIndex < 0 || spreadIndex > totalSpreads) return;
 
-  // Flip the leaves
+  // Pause any playing videos when turning the page
+  document.querySelectorAll('video').forEach(vid => vid.pause());
+
   for (let i = 0; i < numLeaves; i++) {
     if (i < spreadIndex) {
       leafEls[i].classList.add('flipped');
@@ -798,7 +860,6 @@ function goToSpread(spreadIndex) {
   currentSpread = spreadIndex;
   updateZIndex();
 
-  // Shift container center of gravity based on state
   if (currentSpread === 0) {
     bookContainer.className = 'book-container closed-front';
   } else if (currentSpread === totalSpreads) {
@@ -807,10 +868,13 @@ function goToSpread(spreadIndex) {
     bookContainer.className = 'book-container opened';
   }
 
-  // Update UI Nav
   if (currentSpread > 0) {
     navControls.classList.add('visible');
-    waxSeal.classList.add('seal-broken'); // Hide seal once opened
+    waxSeal.classList.add('seal-broken'); 
+    
+    // Also break the twine when opened
+    const twineEl = document.getElementById('twine');
+    if(twineEl) twineEl.classList.add('seal-broken');
   }
   
   counter.textContent = currentSpread === 0 ? "Cover" : (currentSpread === totalSpreads ? "Fin" : `${currentSpread} / ${totalSpreads - 1}`);
@@ -818,21 +882,19 @@ function goToSpread(spreadIndex) {
   nextBtn.disabled = currentSpread === totalSpreads;
 }
 
-// Event Listeners
 waxSeal.addEventListener('click', () => {
-  goToSpread(1); // Break seal and open to first page
+  goToSpread(1); 
 });
 
 prevBtn.addEventListener('click', () => goToSpread(currentSpread - 1));
 nextBtn.addEventListener('click', () => goToSpread(currentSpread + 1));
 
 document.addEventListener('keydown', e => {
-  if (currentSpread === 0) return; // Don't allow arrows until seal broken
+  if (currentSpread === 0) return; 
   if (e.key === 'ArrowRight' && currentSpread < totalSpreads) goToSpread(currentSpread + 1);
   if (e.key === 'ArrowLeft' && currentSpread > 0) goToSpread(currentSpread - 1);
 });
 
-// Init
 updateZIndex();
 counter.textContent = "Cover";
 </script>
